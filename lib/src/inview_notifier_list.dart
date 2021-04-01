@@ -54,9 +54,8 @@ class InViewNotifierList extends InViewNotifier {
         );
 
   static InViewState of(BuildContext context) {
-    final InheritedInViewWidget widget = context
-        .getElementForInheritedWidgetOfExactType<InheritedInViewWidget>()
-        .widget;
+    final InheritedInViewWidget widget =
+        context.getElementForInheritedWidgetOfExactType<InheritedInViewWidget>().widget;
     return widget.inViewState;
   }
 }
@@ -108,9 +107,8 @@ class InViewNotifierCustomScrollView extends InViewNotifier {
         );
 
   static InViewState of(BuildContext context) {
-    final InheritedInViewWidget widget = context
-        .getElementForInheritedWidgetOfExactType<InheritedInViewWidget>()
-        .widget;
+    final InheritedInViewWidget widget =
+        context.getElementForInheritedWidgetOfExactType<InheritedInViewWidget>().widget;
     return widget.inViewState;
   }
 }
@@ -172,6 +170,41 @@ class InViewNotifierWidget extends StatelessWidget {
         },
       ),
     );
+  }
+}
+
+class InViewWidget extends StatelessWidget {
+  ///a required String property. This should be unique for every widget
+  ///that wants to get notified.
+  final String id;
+
+  ///The function that defines and returns the widget that should be notified
+  ///as inView.
+  ///
+  ///The `isInView` tells whether the returned widget is in view or not.
+  ///
+  ///The child should typically be part of the returned widget tree.
+  final InViewNotifierWidgetBuilder builder;
+
+  ///The child widget to pass to the builder.
+  final Widget child;
+
+  const InViewWidget({
+    Key key,
+    @required this.id,
+    @required this.builder,
+    this.child,
+  })  : assert(id != null),
+        assert(builder != null),
+        super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    InViewState state = InViewNotifierList.of(context);
+    state.addContext(context: context, id: id);
+
+    final bool isInView = state.inView(id);
+    return builder(context, isInView, child);
   }
 }
 
